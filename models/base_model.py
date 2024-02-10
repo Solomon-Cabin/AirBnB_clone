@@ -22,17 +22,13 @@ class BaseModel:
                 elif key != '__class__':
                     setattr(self, key, value)
         else:
-            self.id = str(uuid.uuid4())
+            self.id = str(uuid4())
             self.created_at = self.updated_at = datetime.now()
 
     def save(self):
         """Update updated_at with the current datetime."""
         self.updated_at = datetime.today()
-        models.storage.save()
 
-    def __str__(self):
-        """Return string representation of BaseModel instance."""
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
     def to_dict(self):
         """Return the dictionary of the BaseModel instance.
 
@@ -45,3 +41,7 @@ class BaseModel:
         rdict["__class__"] = self.__class__.__name__
         return rdict
 
+    def __str__(self):
+        """Return the print/str representation of the BaseModel instance."""
+        clname = self.__class__.__name__
+        return "[{}] ({}) {}".format(clname, self.id, self.__dict__)
