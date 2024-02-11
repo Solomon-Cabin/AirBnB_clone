@@ -17,18 +17,33 @@ class FileStorage:
         __file_path (str): The name of the file to save objects to.
         __objects (dict): A dictionary of instantiated objects.
     """
-    if kwargs:
-            for key, value in kwargs.items():
-                if key == 'created_at' or key == 'updated_at':
-                    setattr(self, key, datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f'))
-                elif key != '__class__':
-                    setattr(self, key, value)
-        else:
-            self.id = str(uuid.uuid4())
-            self.created_at = self.updated_at = datetime.now()
-            storage.new(self)
+    __file_path = "file.json"
+    __objects = {}
+
+    def all(self):
+        """Return the dictionary __objects."""
+        return FileStorage.__objects
+
+    def new(self, obj):
+        """Set in __objects obj with key <obj_class_name>.id"""
+        ocname = obj.__class__.__name__
+        FileStorage.__objects["{}.{}".format(ocname, obj.id)] = obj
 
     def save(self):
-        """Update updated_at with the current datetime and save the instance."""
-        self.updated_at = datetime.today()
-        storage.save()
+        """Serialize __objects to the JSON file __file_path."""
+        odict = FileStorage.__objects
+        objdict = {obj: odict[obj].to_dict() for obj in odict.keys()}
+        with open(FileStorage.__file_path, "w") as f:
+            json.dump(objdict, f)
+
+    def reload(self):
+        """Deserialize the JSON file __file_path to __objects, if it exists."""
+        try:
+            with open(FileStorage.__file_path) as f:
+                objdict = json.load(f)
+                for o in objdict.values():
+                    cls_name = o["__class__"]
+                    del o["__class__"]
+                    self.new(eval(cls_name)(**o))
+        except FileNotFoundError:
+            return

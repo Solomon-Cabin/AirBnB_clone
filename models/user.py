@@ -12,10 +12,8 @@ class User(BaseModel):
         first_name (str): The first name of the user.
         last_name (str): The last name of the user.
     """
-    def __init__(self, *args, **kwargs):
-        """Initialize a new User."""
-        super().__init__(*args, **kwargs)
-        self.email = kwargs.get('email', '')
-        self.password = kwargs.get('password', '')
-        self.first_name = kwargs.get('first_name', '')
-        self.last_name = kwargs.get('last_name', '')
+
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
